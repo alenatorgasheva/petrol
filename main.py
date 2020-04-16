@@ -65,45 +65,6 @@ def get_applications():
 
     return applications
 
-def get_least_queue(dir_3):
-    """
-    Finding the least queue.
-    :param dir_3: current lines
-    :return: least queue
-    """
-    # Словарь 3 которого еще нет
-    # dir_3 = {1: {'сколько машин в очереди': 3, 'машина 1': 10, 'машина 2': 30, 'машина 3': 40},
-    #      2: {'сколько машин в очереди': 2, 'машина 1': 20, 'машина 2': 30},
-    #      3: {'сколько машин в очереди': 2, 'машина 1': 20, 'машина 2': 30}}
-    min_val = []
-    line = {}
-    for key, val in dir_3.items():
-        for k, v in val.items():
-            if k == 'сколько машин в очереди':
-                line[key] = val[k]
-    for value in line.values():
-        min_val.append(value)
-    min_l = min(min_val)
-
-    new_line = {}
-    for key, value in line.items():
-        new_line[value] = key
-    least_queue = new_line[min_l]
-    return least_queue
-
-
-def queue_shift(dir_3, applications):
-    """
-    The movement of cars in line.
-    :param dir_3: current lines
-    :param applications: list of applications
-    :return: new applications
-    """
-    for value in dir_3.values():
-        for k, v in value.items():
-            if k == 'машина 1' and v == 0:
-                applications.pop(0)
-    return applications
 
 
 def info_about_petrol_kinds(petrol_stations):
@@ -156,6 +117,7 @@ def current_queues(petrol_stations):
     return current_queues
 
 
+
 def add_to_queue(application, info_about_petrol_kinds, current_queue):
     """
     Function for adding car to queue.
@@ -191,9 +153,48 @@ def add_to_queue(application, info_about_petrol_kinds, current_queue):
             int(application.split()[1])
         return
 
+
     else:
         print('машина уехала, т к все очереди макс')
         return
+
+
+def get_least_queue(current_queue):
+    """
+    Finding the least queue.
+    :param dir_3: current lines
+    :return: least queue
+    """
+    min_val = []
+    line = {}
+    for key, val in current_queue.items():
+        for k, v in val.items():
+            if k == 'cars in the queue':
+                line[key] = val[k]
+    for value in line.values():
+        min_val.append(value)
+    min_l = min(min_val)
+
+    new_line = {}
+    for key, value in line.items():
+        new_line[value] = key
+    least_queue = new_line[min_l]
+    return least_queue  # На какой из трех станций наименьшая очередь
+
+
+def queue_shift(current_queue, applications):
+    """
+    The movement of cars in line.
+    :param dir_3: current lines
+    :param applications: list of applications
+    :return: new applications
+    """
+    for value in current_queue.values():
+        for k, v in value.items():
+            if k == 'car 1' and v == 0:
+                applications.pop(0)
+    return applications  # Новый список applications без первой заявки, после того как ее время стало = 0
+
 
 def main():
     petrol_stations = data_petrol_stations()
