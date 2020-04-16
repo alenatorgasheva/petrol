@@ -67,6 +67,7 @@ def get_applications():
 def get_least_queue(dir_3):
     """
     Finding the least queue.
+    :param dir_3: current lines
     :return: least queue
     """
     # Словарь 3 которого еще нет
@@ -90,12 +91,18 @@ def get_least_queue(dir_3):
     return least_queue
 
 
-def queue_shift():
+def queue_shift(dir_3, applications):
     """
     The movement of cars in line.
+    :param dir_3: current lines
+    :param applications: list of applications
     :return: new applications
     """
-
+    for value in dir_3.values():
+        for k, v in value.items():
+            if k == 'машина 1' and v == 0:
+                applications.pop(0)
+    return applications
 
 
 def main():
