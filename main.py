@@ -13,7 +13,7 @@
 #            'kinds' : ['АИ-92', 'АИ-95', 'АИ-98']}}
 
 import codecs
-import math
+
 
 
 def data_petrol_stations():
@@ -117,10 +117,11 @@ def current_queues(petrol_stations):
 
 
 
-def add_to_queue(application, info_about_petrol_kinds, current_queue):
+def add_to_queue(application, info_about_petrol_kinds, current_queue,client_lost):
     """
     Function for adding car to queue.
     :param application: application for service
+    :param client_lost: number of customers who left the gas station
     :param info_about_petrol_kinds: dictionary with the information about
      kinds of petrol
     :param current_queue: dictionary with the information about current queues
@@ -128,7 +129,7 @@ def add_to_queue(application, info_about_petrol_kinds, current_queue):
     """
     # application - это одна строка из applications типа '00:12 40 АИ-92'
     kind_of_petrol = application.split()[2]
-    time = math.ceil(int(application.split()[1]) / 10)
+    time = litres_to_minutes(int(application.split()[1]))
     choice = []
     # Очереди формируются по закону – новый автомобиль добавляется только в очередь к автомату,
     # если это автомат способен заправить автомобиль необходимой маркой бензина.
@@ -154,6 +155,7 @@ def add_to_queue(application, info_about_petrol_kinds, current_queue):
 
 
     else:
+        client_lost[0] = client_lost[0]+1
         print('машина уехала, т к все очереди макс')
         return
 
@@ -174,15 +176,33 @@ def queue_shift(current_queue, applications):
 
 
 def main():
+    client_lost=[0]
     petrol_stations = data_petrol_stations()
     info_about_kinds = info_about_petrol_kinds(petrol_stations)
     current_queue = current_queues(petrol_stations)
     petrol_litres = 45
     filling_time = litres_to_minutes(petrol_litres)
-    add_to_queue('00:12 40 АИ-92',info_about_kinds,current_queue)
+    add_to_queue('00:12 40 АИ-92',info_about_kinds,current_queue,client_lost)
     print(current_queue)
     print(petrol_stations)
     print(info_about_kinds)
+
+
+
+# Вывод в самом конце программы:
+
+    print('Number of liters that sold per day: ',info_about_kinds['total amount'
+                                                                  ' of petrol'])
+    info_about_kinds.pop('total amount of petrol')
+    total_revenue = 0
+    for kind in info_about_kinds:
+        print('Number of liters of {} petrol that sold per day: '.format(kind),
+              info_about_kinds[kind]['amount of petrol'])
+        revenue =info_about_kinds[kind]['amount of petrol']*info_about_kinds[kind]['price']
+        print('Revenue: ',round(revenue,2))
+        total_revenue+=revenue
+    print('Total revenue: ', round(total_revenue,2))
+    print('Number of customers who left the gas station:', client_lost[0])
 
 
 main()
