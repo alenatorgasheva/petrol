@@ -63,8 +63,7 @@ def get_applications():
         for string in file.readlines():
             applications.append(string.strip())
 
-    return applications
-
+    return applications  # Список заявок
 
 
 def info_about_petrol_kinds(petrol_stations):
@@ -159,33 +158,11 @@ def add_to_queue(application, info_about_petrol_kinds, current_queue):
         return
 
 
-def get_least_queue(current_queue):
-    """
-    Finding the least queue.
-    :param dir_3: current lines
-    :return: least queue
-    """
-    min_val = []
-    line = {}
-    for key, val in current_queue.items():
-        for k, v in val.items():
-            if k == 'cars in the queue':
-                line[key] = val[k]
-    for value in line.values():
-        min_val.append(value)
-    min_l = min(min_val)
-
-    new_line = {}
-    for key, value in line.items():
-        new_line[value] = key
-    least_queue = new_line[min_l]
-    return least_queue  # На какой из трех станций наименьшая очередь
-
 
 def queue_shift(current_queue, applications):
     """
     The movement of cars in line.
-    :param dir_3: current lines
+    :param current_queue: dictionary of current queues
     :param applications: list of applications
     :return: new applications
     """
@@ -193,7 +170,7 @@ def queue_shift(current_queue, applications):
         for k, v in value.items():
             if k == 'car 1' and v == 0:
                 applications.pop(0)
-    return applications  # Новый список applications без первой заявки, после того как ее время стало = 0
+    return applications  # Сдвиг машин (Новый список applications без первой заявки, после того как ее время стало = 0)
 
 
 def main():
