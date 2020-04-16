@@ -52,6 +52,52 @@ def litres_to_minutes(litres):
     return minutes
 
 
+def get_applications():
+    """
+    Reading data from a file line by line and writing to a list.
+    :return: list of applications
+    """
+    applications = []
+    with codecs.open('input.txt', 'r', encoding='utf-8') as file:
+        for string in file.readlines():
+            applications.append(string.strip())
+
+    return applications
+
+def get_least_queue(dir_3):
+    """
+    Finding the least queue.
+    :return: least queue
+    """
+    # Словарь 3 которого еще нет
+    # dir_3 = {1: {'сколько машин в очереди': 3, 'машина 1': 10, 'машина 2': 30, 'машина 3': 40},
+    #      2: {'сколько машин в очереди': 2, 'машина 1': 20, 'машина 2': 30},
+    #      3: {'сколько машин в очереди': 2, 'машина 1': 20, 'машина 2': 30}}
+    min_val = []
+    line = {}
+    for key, val in dir_3.items():
+        for k, v in val.items():
+            if k == 'сколько машин в очереди':
+                line[key] = val[k]
+    for value in line.values():
+        min_val.append(value)
+    min_l = min(min_val)
+
+    new_line = {}
+    for key, value in line.items():
+        new_line[value] = key
+    least_queue = new_line[min_l]
+    return least_queue
+
+
+def queue_shift():
+    """
+    The movement of cars in line.
+    :return: new applications
+    """
+
+
+
 def main():
     petrol_stations = data_petrol_stations()
     petrol_litres = 45
