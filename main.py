@@ -161,19 +161,36 @@ def add_to_queue(application, info_about_petrol_kinds, current_queue,client_lost
 
 
 
-def queue_shift(current_queue, applications):
+def queue_shift(current_queue):
     """
     The movement of cars in line.
     :param current_queue: dictionary of current queues
-    :param applications: list of applications
     :return: new applications
     """
-    for value in current_queue.values():
+    num_of_dict = ''
+    num_of_dict2 = ''
+    answ = ''
+    for key, value in current_queue.items():
         for k, v in value.items():
-            if k == 'car 1' and v == 0:
-                applications.pop(0)
-    return applications  # Сдвиг машин (Новый список applications без первой заявки, после того как ее время стало = 0)
-
+            if 'сar 1' in value:
+                if 'car 3' in value:
+                    if k == 'сar 1' and v == 0: # Если ее время истекло
+                        answ = '3 cars'
+                        c_2 = value['сar 2']
+                        c_3 = value['сar 3']
+                        value['сar 1'] = c_2
+                        value['сar 2'] = c_3
+                        num_of_dict = key
+                else:
+                    answ = '2 cars'
+                    c_2 = value['сar 2']
+                    value['сar 1'] = c_2
+                    num_of_dict2 = key
+    if answ == '3 cars':
+        del current_queue[num_of_dict]['сar 3']
+    elif answ == '2 cars':
+        del current_queue[num_of_dict2]['сar 2']
+    return current_queue
 
 def main():
     client_lost=[0]
