@@ -159,7 +159,15 @@ def queue_shift(current_queue):
     :param current_queue: dictionary of current queues
     :return: new applications
     """
+    current_queue.pop('сar 1')
 
+    if current_queue['cars in the queue'] != 1:
+        for car_number in range(1, current_queue['cars in the queue']):
+            current_queue['сar ' + str(car_number)] = current_queue['сar ' + str(car_number + 1)].copy()
+        current_queue.pop('сar ' + str(current_queue['cars in the queue']))
+
+    current_queue['cars in the queue'] -= 1
+    return current_queue
 
 
 def main():
@@ -167,32 +175,27 @@ def main():
     petrol_stations = data_petrol_stations()
     info_about_kinds = info_about_petrol_kinds(petrol_stations)
     current_queue = current_queues(petrol_stations)
-    add_to_queue('00:12 40 АИ-92', info_about_kinds, current_queue, client_lost)
-    print(petrol_stations)
-    print(info_about_kinds)
-    print(current_queue)
-
     applications = get_applications()
 
     new_car = applications[0]
     new_car_arrival_time = new_car[:5]
-    print(new_car, new_car_arrival_time)
     current_time = '00:00'
     while current_time != '23:59':
         # уменьшаем время заправки первой машины
         for station in current_queue:
             if current_queue[station]['cars in the queue'] != 0:
-                current_queue[station]['car 1']['time left'] -= 1
+                current_queue[station]['сar 1']['time left'] -= 1
 
-                if current_queue[station]['car 1']['time left'] == 0:
+                if current_queue[station]['сar 1']['time left'] == 0:
                     print('В  {}  клиент  {}  заправил свой автомобиль и '
-                          'покинул АЗС.'.format(current_time, current_queue[station]['car 1']['car info']))
-                    current_queue[] = queue_shift(current_queue)
+                          'покинул АЗС.'.format(current_time, current_queue[station]['сar 1']['car info']))
+                    current_queue[station] = queue_shift(current_queue[station])
                     for station_number in petrol_stations:
                         print('Автомат №{}  максимальная очередь: {} Марки бензина: {} '
                               '->'.format(station_number, petrol_stations[station_number]['queue'],
                                           ' '.join(petrol_stations[station_number]['kinds'])), end='')
                         print('*' * current_queue[station_number]['cars in the queue'])
+                    print()
 
         # добавляем в очередь
         if new_car_arrival_time == current_time:
@@ -210,14 +213,15 @@ def main():
                       '->'.format(station, petrol_stations[station]['queue'],
                                   ' '.join(petrol_stations[station]['kinds'])), end='')
                 print('*' * current_queue[station]['cars in the queue'])
+            print()
 
         hour, minute = map(int, current_time.split(':'))
         minute += 1
         if minute == 60:
             hour += 1
             minute = 0
-        hour = '{:2d}'.format(hour)
-        minute = '{:2d}'.format(minute)
+        hour = '{:02d}'.format(hour)
+        minute = '{:02d}'.format(minute)
         current_time = hour + ':' + minute
 
     # Вывод в самом конце программы:
