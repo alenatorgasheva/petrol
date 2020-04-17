@@ -5,15 +5,8 @@
 #              Zemtseva A.       (%),
 #              Torgasheva A.     (%).
 
-# {'1':     {'queue' : '3',
-#            'kinds' : ['АИ-80']},
-#  '2':     {'queue' : '2',
-#            'kinds' : ['АИ-92']},
-#  '3':     {'queue' : '4',
-#            'kinds' : ['АИ-92', 'АИ-95', 'АИ-98']}}
 
 import codecs
-
 
 
 def data_petrol_stations():
@@ -22,7 +15,7 @@ def data_petrol_stations():
     :return: dictionary with data about petrol stations
     """
     petrol_stations = {}
-    with codecs.open('azs.txt', 'r', encoding='windows-1251') as file_in:
+    with codecs.open('azs.txt', 'r', encoding='UTF-8') as file_in:
         for string in file_in.readlines():
             string = string.split()
             station_number = int(string[0])
@@ -59,7 +52,7 @@ def get_applications():
     :return: list of applications
     """
     applications = []
-    with codecs.open('input.txt', 'r', encoding='windows-1251') as file:
+    with codecs.open('input.txt', 'r', encoding='UTF-8') as file:
         for string in file.readlines():
             applications.append(string.strip())
 
@@ -116,8 +109,7 @@ def current_queues(petrol_stations):
     return current_queues
 
 
-
-def add_to_queue(application, info_about_petrol_kinds, current_queue,client_lost):
+def add_to_queue(application, info_about_petrol_kinds, current_queue, client_lost):
     """
     Function for adding car to queue.
     :param application: application for service
@@ -125,7 +117,7 @@ def add_to_queue(application, info_about_petrol_kinds, current_queue,client_lost
     :param info_about_petrol_kinds: dictionary with the information about
      kinds of petrol
     :param current_queue: dictionary with the information about current queues
-    :return: None
+    :return: station
     """
     # application - это одна строка из applications типа '00:12 40 АИ-92'
     kind_of_petrol = application.split()[2]
@@ -135,7 +127,7 @@ def add_to_queue(application, info_about_petrol_kinds, current_queue,client_lost
     # если это автомат способен заправить автомобиль необходимой маркой бензина.
     # Из всех таких автоматов выбирается тот, у которого меньше очередь.
     for station in info_about_petrol_kinds[kind_of_petrol]['stations']:
-        if current_queue[station]['cars in the queue'] !=\
+        if current_queue[station]['cars in the queue'] != \
                 current_queue[station]['max of queue']:
             choice.append((current_queue[station]['cars in the queue'],
                            station))
@@ -144,21 +136,21 @@ def add_to_queue(application, info_about_petrol_kinds, current_queue,client_lost
         station = choice[0][1]
         # добавляем в очередь
         current_queue[station]['cars in the queue'] += 1
-        current_queue[station]['сar ' + str(len(current_queue[station]) - 2 + 1
-                                            )] = time
+        current_queue[station]['сar ' + str(len(current_queue[station]) - 2 + 1)] = {}
+        current_queue[station]['сar ' + str(len(current_queue[station]) - 2)]['time left'] = time
+        current_queue[station]['сar ' + str(len(current_queue[station]) - 2)]['car info'] = application
         # из-за того, что машина встала в очередь меняется 'total amount of petrol' и 'amount of petrol'
-        info_about_petrol_kinds['total amount of petrol'] +=\
+        info_about_petrol_kinds['total amount of petrol'] += \
             int(application.split()[1])
-        info_about_petrol_kinds[kind_of_petrol]['amount of petrol'] +=\
+        info_about_petrol_kinds[kind_of_petrol]['amount of petrol'] += \
             int(application.split()[1])
-        return
+        return station
 
 
     else:
-        client_lost[0] = client_lost[0]+1
+        client_lost[0] = client_lost[0] + 1
         print('машина уехала, т к все очереди макс')
         return
-
 
 
 def queue_shift(current_queue):
@@ -167,59 +159,82 @@ def queue_shift(current_queue):
     :param current_queue: dictionary of current queues
     :return: new applications
     """
-    num_of_dict = ''
-    num_of_dict2 = ''
-    answ = ''
-    for key, value in current_queue.items():
-        for k, v in value.items():
-            if 'сar 1' in value:
-                if 'car 3' in value:
-                    if k == 'сar 1' and v == 0: # Если ее время истекло
-                        answ = '3 cars'
-                        c_2 = value['сar 2']
-                        c_3 = value['сar 3']
-                        value['сar 1'] = c_2
-                        value['сar 2'] = c_3
-                        num_of_dict = key
-                else:
-                    answ = '2 cars'
-                    c_2 = value['сar 2']
-                    value['сar 1'] = c_2
-                    num_of_dict2 = key
-    if answ == '3 cars':
-        del current_queue[num_of_dict]['сar 3']
-    elif answ == '2 cars':
-        del current_queue[num_of_dict2]['сar 2']
-    return current_queue
+
+
 
 def main():
-    client_lost=[0]
+    client_lost = [0]
     petrol_stations = data_petrol_stations()
     info_about_kinds = info_about_petrol_kinds(petrol_stations)
     current_queue = current_queues(petrol_stations)
-    petrol_litres = 45
-    filling_time = litres_to_minutes(petrol_litres)
-    add_to_queue('00:12 40 АИ-92',info_about_kinds,current_queue,client_lost)
-    print(current_queue)
+    add_to_queue('00:12 40 АИ-92', info_about_kinds, current_queue, client_lost)
     print(petrol_stations)
     print(info_about_kinds)
+    print(current_queue)
 
+    applications = get_applications()
 
+    new_car = applications[0]
+    new_car_arrival_time = new_car[:5]
+    print(new_car, new_car_arrival_time)
+    current_time = '00:00'
+    while current_time != '23:59':
+        # уменьшаем время заправки первой машины
+        for station in current_queue:
+            if current_queue[station]['cars in the queue'] != 0:
+                current_queue[station]['car 1']['time left'] -= 1
 
-# Вывод в самом конце программы:
+                if current_queue[station]['car 1']['time left'] == 0:
+                    print('В  {}  клиент  {}  заправил свой автомобиль и '
+                          'покинул АЗС.'.format(current_time, current_queue[station]['car 1']['car info']))
+                    current_queue[] = queue_shift(current_queue)
+                    for station_number in petrol_stations:
+                        print('Автомат №{}  максимальная очередь: {} Марки бензина: {} '
+                              '->'.format(station_number, petrol_stations[station_number]['queue'],
+                                          ' '.join(petrol_stations[station_number]['kinds'])), end='')
+                        print('*' * current_queue[station_number]['cars in the queue'])
 
-    print('Number of liters that sold per day: ',info_about_kinds['total amount'
-                                                                  ' of petrol'])
+        # добавляем в очередь
+        if new_car_arrival_time == current_time:
+            update_station = add_to_queue(new_car, info_about_kinds,
+                                          current_queue, client_lost)
+            print('В  {}  новый клиент:  {} встал в очередь '
+                  'к автомату №{}'.format(current_time, new_car, update_station))
+
+            applications = applications[1:]
+            new_car = applications[0]
+            new_car_arrival_time = new_car[:5]
+
+            for station in petrol_stations:
+                print('Автомат №{}  максимальная очередь: {} Марки бензина: {} '
+                      '->'.format(station, petrol_stations[station]['queue'],
+                                  ' '.join(petrol_stations[station]['kinds'])), end='')
+                print('*' * current_queue[station]['cars in the queue'])
+
+        hour, minute = map(int, current_time.split(':'))
+        minute += 1
+        if minute == 60:
+            hour += 1
+            minute = 0
+        hour = '{:2d}'.format(hour)
+        minute = '{:2d}'.format(minute)
+        current_time = hour + ':' + minute
+
+    # Вывод в самом конце программы:
+    print()
+    print('Number of liters that sold per day: ',
+          info_about_kinds['total amount of petrol'])
     info_about_kinds.pop('total amount of petrol')
     total_revenue = 0
     for kind in info_about_kinds:
         print('Number of liters of {} petrol that sold per day: '.format(kind),
               info_about_kinds[kind]['amount of petrol'])
-        revenue =info_about_kinds[kind]['amount of petrol']*info_about_kinds[kind]['price']
-        print('Revenue: ',round(revenue,2))
-        total_revenue+=revenue
-    print('Total revenue: ', round(total_revenue,2))
+        revenue = info_about_kinds[kind]['amount of petrol'] * info_about_kinds[kind]['price']
+        print('Revenue: ', round(revenue, 2))
+        total_revenue += revenue
+    print('Total revenue: ', round(total_revenue, 2))
     print('Number of customers who left the gas station:', client_lost[0])
 
 
 main()
+
