@@ -9,6 +9,23 @@
 import codecs
 
 
+# Choosing of language.
+
+language = input('Choose your language:\n1. English\n2. Russian\n').lower()
+while True:
+    if language == 'english' or language == 'en' or \
+            language == 'e' or language == '1':
+        import lc_en as lc
+
+        break
+    elif language == 'russian' or language == 'ru' or \
+            language == 'r' or language == '2':
+        import lc_ru as lc
+
+        break
+    language = input('Please, choose language from proposed: ')
+
+
 def data_petrol_stations():
     """
     Getting data about petrol stations.
@@ -149,7 +166,7 @@ def add_to_queue(application, info_about_petrol_kinds, current_queue, client_los
 
     else:
         client_lost[0] = client_lost[0] + 1
-        print('машина уехала, т к все очереди макс')
+        print(lc.TXT_LOCKING_QUEUE)
         return
 
 
@@ -187,12 +204,10 @@ def main():
                 current_queue[station]['сar 1']['time left'] -= 1
 
                 if current_queue[station]['сar 1']['time left'] == 0:
-                    print('В  {}  клиент  {}  заправил свой автомобиль и '
-                          'покинул АЗС.'.format(current_time, current_queue[station]['сar 1']['car info']))
+                    print(lc.TXT_CLIENT.format(current_time, current_queue[station]['сar 1']['car info']))
                     current_queue[station] = queue_shift(current_queue[station])
                     for station_number in petrol_stations:
-                        print('Автомат №{}  максимальная очередь: {} Марки бензина: {} '
-                              '->'.format(station_number, petrol_stations[station_number]['queue'],
+                        print(lc.TXT_QUEUE_AT_THE_FILLING_MACHINE.format(station_number, petrol_stations[station_number]['queue'],
                                           ' '.join(petrol_stations[station_number]['kinds'])), end='')
                         print('*' * current_queue[station_number]['cars in the queue'])
                     print()
@@ -201,16 +216,14 @@ def main():
         if new_car_arrival_time == current_time:
             update_station = add_to_queue(new_car, info_about_kinds,
                                           current_queue, client_lost)
-            print('В  {}  новый клиент:  {} встал в очередь '
-                  'к автомату №{}'.format(current_time, new_car, update_station))
+            print(lc.TXT_NEW_CLIENT.format(current_time, new_car, update_station))
 
             applications = applications[1:]
             new_car = applications[0]
             new_car_arrival_time = new_car[:5]
 
             for station in petrol_stations:
-                print('Автомат №{}  максимальная очередь: {} Марки бензина: {} '
-                      '->'.format(station, petrol_stations[station]['queue'],
+                print(lc.TXT_QUEUE_AT_THE_FILLING_MACHINE.format(station, petrol_stations[station]['queue'],
                                   ' '.join(petrol_stations[station]['kinds'])), end='')
                 print('*' * current_queue[station]['cars in the queue'])
             print()
@@ -226,18 +239,18 @@ def main():
 
     # Вывод в самом конце программы:
     print()
-    print('Number of liters that sold per day: ',
+    print(lc.TXT_TOTAL_OF_LITERS,
           info_about_kinds['total amount of petrol'])
     info_about_kinds.pop('total amount of petrol')
     total_revenue = 0
     for kind in info_about_kinds:
-        print('Number of liters of {} petrol that sold per day: '.format(kind),
+        print(lc.TXT_NUM_OF_LITERS.format(kind),
               info_about_kinds[kind]['amount of petrol'])
         revenue = info_about_kinds[kind]['amount of petrol'] * info_about_kinds[kind]['price']
-        print('Revenue: ', round(revenue, 2))
+        print(lc.TXT_REVENUE, round(revenue, 2))
         total_revenue += revenue
-    print('Total revenue: ', round(total_revenue, 2))
-    print('Number of customers who left the gas station:', client_lost[0])
+    print(lc.TXT_TOTAL_REVENUE, round(total_revenue, 2))
+    print(lc.TXT_WHO_LEFT, client_lost[0])
 
 
 main()
