@@ -2,7 +2,7 @@
 # This program keeps a report on the operation of the gas station.
 
 # Developers : Daniel A.         (40%),
-#              Zemtseva A.       (%),
+#              Zemtseva A.       (30%),
 #              Torgasheva A.     (45%).
 
 
