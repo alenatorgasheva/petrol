@@ -1,7 +1,7 @@
 # Case - study
 # This program keeps a report on the operation of the gas station.
 
-# Developers : Daniel A.         (%),
+# Developers : Daniel A.         (40%),
 #              Zemtseva A.       (%),
 #              Torgasheva A.     (45%).
 
