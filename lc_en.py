@@ -1,7 +1,7 @@
 # Localization for English.
 
 TXT_CLIENT = 'At  {}  customer:  {}  refueled his car and left the gas station.'
-TXT_QUEUE_AT_THE_FILLING_MACHINE = 'Filling machine №{}  maximum queue: {} Brands of gasoline: {} ->'
+TXT_QUEUE_STATION = 'Filling machine №{}  maximum queue: {} Brands of gasoline: {} ->'
 TXT_LOCKING_QUEUE = 'The client was unable to refuel the car and left due to an accumulated queue.'
 TXT_NEW_CLIENT = 'At  {}  new customer:  {} has queued up to filling machine №{}'
 

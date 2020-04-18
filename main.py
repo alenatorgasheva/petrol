@@ -1,13 +1,12 @@
 # Case - study
-# This program
+# This program keeps a report on the operation of the gas station.
 
 # Developers : Daniel A.         (%),
 #              Zemtseva A.       (%),
-#              Torgasheva A.     (%).
+#              Torgasheva A.     (45%).
 
 
 import codecs
-
 
 # Choosing of language.
 
@@ -24,6 +23,7 @@ while True:
 
         break
     language = input('Please, choose language from proposed: ')
+print()
 
 
 def data_petrol_stations():
@@ -73,7 +73,7 @@ def get_applications():
         for string in file.readlines():
             applications.append(string.strip())
 
-    return applications  # Список заявок
+    return applications
 
 
 def info_about_petrol_kinds(petrol_stations):
@@ -136,13 +136,10 @@ def add_to_queue(application, info_about_petrol_kinds, current_queue, client_los
     :param current_queue: dictionary with the information about current queues
     :return: station
     """
-    # application - это одна строка из applications типа '00:12 40 АИ-92'
     kind_of_petrol = application.split()[2]
     time = litres_to_minutes(int(application.split()[1]))
+
     choice = []
-    # Очереди формируются по закону – новый автомобиль добавляется только в очередь к автомату,
-    # если это автомат способен заправить автомобиль необходимой маркой бензина.
-    # Из всех таких автоматов выбирается тот, у которого меньше очередь.
     for station in info_about_petrol_kinds[kind_of_petrol]['stations']:
         if current_queue[station]['cars in the queue'] != \
                 current_queue[station]['max of queue']:
@@ -151,18 +148,17 @@ def add_to_queue(application, info_about_petrol_kinds, current_queue, client_los
     if len(choice) != 0:
         choice.sort()
         station = choice[0][1]
-        # добавляем в очередь
         current_queue[station]['cars in the queue'] += 1
         current_queue[station]['сar ' + str(len(current_queue[station]) - 2 + 1)] = {}
         current_queue[station]['сar ' + str(len(current_queue[station]) - 2)]['time left'] = time
         current_queue[station]['сar ' + str(len(current_queue[station]) - 2)]['car info'] = application
-        # из-за того, что машина встала в очередь меняется 'total amount of petrol' и 'amount of petrol'
+
         info_about_petrol_kinds['total amount of petrol'] += \
             int(application.split()[1])
         info_about_petrol_kinds[kind_of_petrol]['amount of petrol'] += \
             int(application.split()[1])
-        return station
 
+        return station
 
     else:
         client_lost[0] = client_lost[0] + 1
@@ -198,7 +194,6 @@ def main():
     new_car_arrival_time = new_car[:5]
     current_time = '00:00'
     while current_time != '23:59':
-        # уменьшаем время заправки первой машины
         for station in current_queue:
             if current_queue[station]['cars in the queue'] != 0:
                 current_queue[station]['сar 1']['time left'] -= 1
@@ -207,12 +202,11 @@ def main():
                     print(lc.TXT_CLIENT.format(current_time, current_queue[station]['сar 1']['car info']))
                     current_queue[station] = queue_shift(current_queue[station])
                     for station_number in petrol_stations:
-                        print(lc.TXT_QUEUE_AT_THE_FILLING_MACHINE.format(station_number, petrol_stations[station_number]['queue'],
-                                          ' '.join(petrol_stations[station_number]['kinds'])), end='')
+                        print(lc.TXT_QUEUE_STATION.format(station_number, petrol_stations[station_number]['queue'],
+                                                          ' '.join(petrol_stations[station_number]['kinds'])), end='')
                         print('*' * current_queue[station_number]['cars in the queue'])
                     print()
 
-        # добавляем в очередь
         if new_car_arrival_time == current_time:
             update_station = add_to_queue(new_car, info_about_kinds,
                                           current_queue, client_lost)
@@ -223,8 +217,8 @@ def main():
             new_car_arrival_time = new_car[:5]
 
             for station in petrol_stations:
-                print(lc.TXT_QUEUE_AT_THE_FILLING_MACHINE.format(station, petrol_stations[station]['queue'],
-                                  ' '.join(petrol_stations[station]['kinds'])), end='')
+                print(lc.TXT_QUEUE_STATION.format(station, petrol_stations[station]['queue'],
+                                                  ' '.join(petrol_stations[station]['kinds'])), end='')
                 print('*' * current_queue[station]['cars in the queue'])
             print()
 
@@ -237,21 +231,21 @@ def main():
         minute = '{:02d}'.format(minute)
         current_time = hour + ':' + minute
 
-    # Вывод в самом конце программы:
     print()
     print(lc.TXT_TOTAL_OF_LITERS,
           info_about_kinds['total amount of petrol'])
     info_about_kinds.pop('total amount of petrol')
     total_revenue = 0
+
     for kind in info_about_kinds:
         print(lc.TXT_NUM_OF_LITERS.format(kind),
               info_about_kinds[kind]['amount of petrol'])
         revenue = info_about_kinds[kind]['amount of petrol'] * info_about_kinds[kind]['price']
         print(lc.TXT_REVENUE, round(revenue, 2))
         total_revenue += revenue
+
     print(lc.TXT_TOTAL_REVENUE, round(total_revenue, 2))
     print(lc.TXT_WHO_LEFT, client_lost[0])
 
 
 main()
-
